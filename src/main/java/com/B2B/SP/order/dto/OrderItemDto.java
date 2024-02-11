@@ -1,5 +1,7 @@
 package com.B2B.SP.order.dto;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +12,13 @@ import lombok.NoArgsConstructor;
 public class OrderItemDto {
 
     private Long orderItemId;
+
     private OrderDto orderDto;
+
+    @NotNull(message = "Product ID cannot be null")
     private Long productId;
+
+    @NotNull(message = "Product quantity cannot be null")
+    @PositiveOrZero(message = "Product quantity must be a positive number or zero")
     private Long productQuantity;
 }
