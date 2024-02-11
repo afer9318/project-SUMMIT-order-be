@@ -13,7 +13,8 @@ public class OrderItemDto {
 
     private Long orderItemId;
 
-    private OrderDto orderDto;
+    @NotNull(message = "Order ID cannot be null")
+    private Long orderId;
 
     @NotNull(message = "Product ID cannot be null")
     private Long productId;
