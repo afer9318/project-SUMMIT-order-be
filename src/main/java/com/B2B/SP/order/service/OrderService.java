@@ -14,4 +14,6 @@ public interface OrderService {
     OrderDto save(OrderDto orderDto);
 
     OrderDto update(OrderDto orderDto);
+
+    void deleteById(Long orderId);
 }

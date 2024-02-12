@@ -114,4 +114,24 @@ public class OrderServiceImpl implements OrderService{
             throw e;
         }
     }
+
+    @Override
+    @Transactional
+    public void deleteById(Long orderId) {
+        try{
+            logger.info("Deleting order: {}", orderId);
+
+            Optional<Order> optionalOrder = orderRepository.findByIdActiveOrder(orderId);
+
+            if (optionalOrder.isEmpty()){
+                logger.error("Order already deleted");
+                throw new OrderNotFoundException("Order already deleted");
+            }
+
+            orderRepository.deleteById(orderId);
+        }catch (Exception e){
+            logger.error("Exception while saving order", e);
+            throw e;
+        }
+    }
 }
