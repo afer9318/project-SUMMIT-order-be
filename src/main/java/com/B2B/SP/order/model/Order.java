@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "orders")
+@SQLDelete(sql = "UPDATE orders SET active_order = false WHERE order_Id=?")
 public class Order {
 
     // fields
