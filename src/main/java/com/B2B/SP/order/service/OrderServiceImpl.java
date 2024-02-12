@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,6 +78,37 @@ public class OrderServiceImpl implements OrderService{
             Order savedOrder = orderRepository.save(order);
 
             return OrderMapper.INSTANCE.orderToDTO(savedOrder);
+        }catch (Exception e){
+            logger.error("Exception while saving order", e);
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public OrderDto update(OrderDto orderDto) {
+        try{
+            Long orderId = orderDto.getOrderId();
+
+            if (orderId == null){
+                logger.error("Cannot update order without id");
+                throw new BadRequestException("Cannot update order without id");
+            }
+
+            if(!orderDto.getActiveOrder()){
+                throw new BadRequestException("Cannot update order as inactive");
+            }
+
+            Optional<Order> optionalOrder = orderRepository.findByIdActiveOrder(orderId);
+
+            if (optionalOrder.isEmpty()){
+                logger.error("Cannot update deleted order");
+                throw new BadRequestException("Cannot update deleted order");
+            }
+
+            Order updatedOrder = OrderMapper.INSTANCE.dtoToOrder(orderDto);
+            updatedOrder = orderRepository.save(updatedOrder);
+            return OrderMapper.INSTANCE.orderToDTO(updatedOrder);
         }catch (Exception e){
             logger.error("Exception while saving order", e);
             throw e;

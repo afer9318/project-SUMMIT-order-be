@@ -37,4 +37,10 @@ public class OrderController {
         OrderDto savedOrderDto = orderService.save(orderDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedOrderDto);
     }
+
+    @PutMapping("/")
+    public ResponseEntity<OrderDto> updateOrder(@Validated @RequestBody OrderDto orderDto){
+        OrderDto updatedOrderDto = orderService.update(orderDto);
+        return ResponseEntity.ok(orderDto);
+    }
 }
