@@ -1,6 +1,7 @@
 package com.B2B.SP.order.service;
 
 import com.B2B.SP.order.dto.OrderDto;
+import com.B2B.SP.order.exceptions.customexceptions.BadRequestException;
 import com.B2B.SP.order.exceptions.customexceptions.OrderNotFoundException;
 import com.B2B.SP.order.mapper.OrderMapper;
 import com.B2B.SP.order.model.Order;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,6 +56,29 @@ public class OrderServiceImpl implements OrderService{
             return OrderMapper.INSTANCE.orderToDTO(order);
         }catch (Exception e){
             logger.error("Exception while finding order by id: {}",orderId, e);
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public OrderDto save(OrderDto orderDto) {
+        try{
+            if (Objects.nonNull(orderDto.getOrderId())) {
+                throw new BadRequestException("Saving order does not need an ID");
+            }
+
+            if(!orderDto.getActiveOrder()){
+                throw new BadRequestException("Cannot create inactive orders");
+            }
+
+            logger.info("Saving order: {}", orderDto);
+            Order order = OrderMapper.INSTANCE.dtoToOrder(orderDto);
+            Order savedOrder = orderRepository.save(order);
+
+            return OrderMapper.INSTANCE.orderToDTO(savedOrder);
+        }catch (Exception e){
+            logger.error("Exception while saving order", e);
             throw e;
         }
     }
