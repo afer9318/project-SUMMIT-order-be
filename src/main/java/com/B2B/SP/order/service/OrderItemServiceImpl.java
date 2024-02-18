@@ -1,6 +1,7 @@
 package com.B2B.SP.order.service;
 
 import com.B2B.SP.order.dto.OrderItemDto;
+import com.B2B.SP.order.exceptions.customexceptions.BadRequestException;
 import com.B2B.SP.order.exceptions.customexceptions.OrderItemNotFoundException;
 import com.B2B.SP.order.mapper.OrderItemMapper;
 import com.B2B.SP.order.model.OrderItem;
@@ -42,6 +43,35 @@ public class OrderItemServiceImpl implements OrderItemService{
 
         }catch (Exception e){
             logger.error("Exception while finding all order items", e);
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public List<OrderItemDto> saveOrderItems(List<OrderItemDto> orderItemDTOList) {
+        try{
+
+            if (orderItemDTOList.stream().anyMatch(orderItemDto -> orderItemDto.getOrderItemId() != null)){
+                throw new BadRequestException("Order items should not have an order item id");
+            }
+
+            if (orderItemDTOList.isEmpty() || orderItemDTOList.stream().map(OrderItemDto::getOrderId).distinct().count() > 1){
+                throw new BadRequestException("All order items must have same order Id");
+            }
+
+            List<OrderItem> orderItemList = orderItemDTOList.stream()
+                    .map(OrderItemMapper.INSTANCE::dtoToOrderItemSave)
+                    .toList();
+
+            List<OrderItem> savedOrderItemList = orderItemsRepository.saveAll(orderItemList);
+
+            return savedOrderItemList.stream()
+                    .map(OrderItemMapper.INSTANCE::orderItemToDTO)
+                    .collect(Collectors.toList());
+
+        }catch(Exception e){
+            logger.error("Exception while saving order items", e);
             throw e;
         }
     }

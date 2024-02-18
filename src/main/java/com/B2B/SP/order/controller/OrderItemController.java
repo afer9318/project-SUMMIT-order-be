@@ -1,13 +1,14 @@
 package com.B2B.SP.order.controller;
 
+import com.B2B.SP.order.dto.OrderDto;
 import com.B2B.SP.order.dto.OrderItemDto;
+import com.B2B.SP.order.model.OrderItem;
 import com.B2B.SP.order.service.OrderItemService;
 import com.B2B.SP.order.service.OrderService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,7 +24,13 @@ public class OrderItemController {
 
     @GetMapping("/{orderId}")
     public ResponseEntity<List<OrderItemDto>> findAllByOrder(@PathVariable Long orderId){
-        List<OrderItemDto> orderItemList= orderItemService.findAllByOrder(orderId);
-        return ResponseEntity.ok(orderItemList);
+        List<OrderItemDto> orderItemDTOList= orderItemService.findAllByOrder(orderId);
+        return ResponseEntity.ok(orderItemDTOList);
+    }
+
+    @PostMapping("/")
+    public ResponseEntity<List<OrderItemDto>> saveOrderItems(@Validated @RequestBody List<OrderItemDto> orderItemDTOList){
+        List<OrderItemDto> savedOrderItemDtoList = orderItemService.saveOrderItems(orderItemDTOList);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedOrderItemDtoList);
     }
 }
